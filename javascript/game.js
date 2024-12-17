@@ -21,46 +21,62 @@ let boats = [2, 3, 3, 4, 5];
 let currentBoatSize = boats[0];
 let isHorizontal = true;
 let boatIsChoosed = false;
+let currentHoveredCell = null;
 
-document.addEventListener("keydown", (event) => {
-  if (event.key === "z" && isHorizontal === true) {
+document.addEventListener("contextmenu", (event) => {
+  event.preventDefault();
+  if (isHorizontal === true) {
+    highlightCells(currentHoveredCell, currentBoatSize, "#222");
     isHorizontal = false;
+    highlightCells(currentHoveredCell, currentBoatSize, "grey");
   } else {
+    highlightCells(currentHoveredCell, currentBoatSize, "#222");
     isHorizontal = true;
+    highlightCells(currentHoveredCell, currentBoatSize, "grey");
   }
 });
 
-function setCurrentBoat(boat) {
-
-  const match = boat.match(/\d+/);
+function setCurrentBoat(boatId) {
+  const pressedButton = (document.getElementById(boatId).disabled = true);
+  const match = boatId.match(/\d+/);
   let boatIndex;
 
-  if(match) {
+  if (match) {
     boatIndex = parseInt(match[0], 10);
   } else {
     throw new Error("Geen getal");
   }
 
-
-  console.log(boat);
+  console.log(boatIndex);
   currentBoatSize = boats[boatIndex];
   boatIsChoosed = true;
 }
 
+function resetBoats() {
+  cellBlocks.forEach((cell) => {
+    if (cell.classList.contains("placed")) {
+      cell.classList.remove("placed");
+      cell.style.backgroundColor = "#222";
+    }
+  });
+
+  for (i = 0; i <= 5; i++) {
+    let button = (document.getElementById(`chooseBoat${i}`).disabled = false);
+    console.log(button);
+  }
+}
+
 //This code loops true all the cellBlock and add an eventlistener with click and if clicked it fires the PlaceBlock funtion
 cellBlocks.forEach((cell) => {
-
   cell.addEventListener("mouseenter", () => {
-
     if (boatIsChoosed === true) {
       const cellIndex = parseInt(cell.dataset.index, 10);
+      currentHoveredCell = cellIndex;
       if (!cell.classList.contains("placed")) {
         highlightCells(cellIndex, currentBoatSize, "grey");
       }
     }
-
   });
-
 
   cell.addEventListener("mouseleave", () => {
     const cellIndex = parseInt(cell.dataset.index, 10);
@@ -70,25 +86,35 @@ cellBlocks.forEach((cell) => {
   });
 
   cell.addEventListener("click", () => {
-    const cellIndex = parseInt(cell.dataset.index, 10);
-    if (canPlaceBoat(cellIndex, currentBoatSize)) {
-      placeBoat(cellIndex, currentBoatSize);
-      boats.shift(); // Verwijder de geplaatste boot
-      currentBoatSize = boats[0]; // Update naar de volgende boot
-      if (!currentBoatSize) {
-        console.log("Alle boten zijn geplaatst!");
+    if (boatIsChoosed === true) {
+      const cellIndex = parseInt(cell.dataset.index, 10);
+      if (canPlaceBoat(cellIndex, currentBoatSize)) {
+        placeBoat(cellIndex, currentBoatSize);
+        currentBoatSize = boats[0]; // Update naar de volgende boot
+        if (!currentBoatSize) {
+          console.log("Alle boten zijn geplaatst!");
+        }
+      } else {
+        console.log("Kan de boot hier niet plaatsen!");
       }
-    } else {
-      console.log("Kan de boot hier niet plaatsen!");
     }
   });
 });
 
-//This hight
 function highlightCells(startIndex, size, color) {
+  // This code happens for all de divs (also the size)
   for (let i = 0; i < size; i++) {
-    const cell = cellBlocks[startIndex + (isHorizontal ? i : i * 10)];
-    if (cell && !cell.classList.contains("placed")) {
+    let cellIndex;
+
+    if (isHorizontal) {
+      cellIndex = startIndex + i;
+    } else {
+      cellIndex = startIndex + i * 10;
+    }
+
+    const cell = cellBlocks[cellIndex];
+
+    if (cell != null && !cell.classList.contains("placed")) {
       cell.style.backgroundColor = color;
     }
   }
@@ -96,20 +122,38 @@ function highlightCells(startIndex, size, color) {
 
 function canPlaceBoat(startIndex, size) {
   for (let i = 0; i < size; i++) {
-    const cell = cellBlocks[startIndex + (isHorizontal ? i : i * 10)];
+    let cellIndex;
+
+    if (isHorizontal) {
+      cellIndex = startIndex + i;
+    } else {
+      cellIndex = startIndex + i * 10;
+    }
+
+    const cell = cellBlocks[cellIndex];
+
     if (!cell || cell.classList.contains("placed")) {
-      return false; // Niet mogelijk om te plaatsen
+      return false; // Can't place the boats
     }
   }
   return true;
 }
 
-//This function just maked the clicked block a grey background color
+//This function just maked the clicked block a red background color
 let boatNumber = 1;
 
 function placeBoat(startIndex, size) {
   for (let i = 0; i < size; i++) {
-    const cell = cellBlocks[startIndex + (isHorizontal ? i : i * 10)];
+    let cellIndex;
+
+    if (isHorizontal) {
+      cellIndex = startIndex + i;
+    } else {
+      cellIndex = startIndex + i * 10;
+    }
+
+    const cell = cellBlocks[cellIndex];
+
     if (cell) {
       cell.classList.add("placed");
       cell.classList.add(`boat-${boatNumber}`);
