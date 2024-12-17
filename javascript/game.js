@@ -22,6 +22,7 @@ let currentBoatSize = boats[0];
 let isHorizontal = true;
 let boatIsChoosed = false;
 let currentHoveredCell = null;
+let boatNumber = 0;
 
 document.addEventListener("contextmenu", (event) => {
   event.preventDefault();
@@ -36,8 +37,10 @@ document.addEventListener("contextmenu", (event) => {
   }
 });
 
-function setCurrentBoat(boatId) {
-  const pressedButton = (document.getElementById(boatId).disabled = true);
+function setCurrentBoat(boatId, newBoatNumber) {
+  const pressedButton = document.getElementById(boatId);
+  pressedButton.style.display = "none";
+
   const match = boatId.match(/\d+/);
   let boatIndex;
 
@@ -50,6 +53,12 @@ function setCurrentBoat(boatId) {
   console.log(boatIndex);
   currentBoatSize = boats[boatIndex];
   boatIsChoosed = true;
+
+  boatNumber = newBoatNumber;
+  console.log(newBoatNumber, boatNumber);
+
+  const replaceButton = document.getElementById(`replaceBoat${boatIndex}`);
+  replaceButton.style.display = "flex";
 }
 
 function resetBoats() {
@@ -61,8 +70,9 @@ function resetBoats() {
   });
 
   for (i = 0; i <= 5; i++) {
-    let button = (document.getElementById(`chooseBoat${i}`).disabled = false);
-    console.log(button);
+    let button = document.getElementById(`chooseBoat${i}`);
+    button.style.display = "flex";
+    let replaceButton = document.querySelector(".replaceBoat"); 
   }
 }
 
@@ -89,7 +99,7 @@ cellBlocks.forEach((cell) => {
     if (boatIsChoosed === true) {
       const cellIndex = parseInt(cell.dataset.index, 10);
       if (canPlaceBoat(cellIndex, currentBoatSize)) {
-        placeBoat(cellIndex, currentBoatSize);
+        placeBoat(cellIndex, currentBoatSize, boatNumber);
         currentBoatSize = boats[0]; // Update naar de volgende boot
         if (!currentBoatSize) {
           console.log("Alle boten zijn geplaatst!");
@@ -140,9 +150,8 @@ function canPlaceBoat(startIndex, size) {
 }
 
 //This function just maked the clicked block a red background color
-let boatNumber = 1;
 
-function placeBoat(startIndex, size) {
+function placeBoat(startIndex, size, boatNumber) {
   for (let i = 0; i < size; i++) {
     let cellIndex;
 
@@ -160,6 +169,19 @@ function placeBoat(startIndex, size) {
       cell.style.backgroundColor = "red";
     }
   }
-  boatNumber++;
   boatIsChoosed = false;
+}
+
+function replaceBoat(boatNumber) {
+
+  cellBlocks.forEach((cell => {
+    if (cell.classList.contains(`boat-${boatNumber}`)) {
+      cell.classList.remove(`boat-${boatNumber}`);
+      cell.classList.remove("placed");
+      cell.style.backgroundColor = "#222";
+    }
+  }));
+
+  setCurrentBoat(`chooseBoat${boatNumber}`, boatNumber);
+
 }

@@ -42,3 +42,11 @@ button:hover {
 button:disabled {
   background-color: #85a6b3;
 }
+
+.replaceBoat {
+  background-color: red;
+  color: white;
+}
+.replaceBoat:hover {
+  background-color: darkred;
+}
