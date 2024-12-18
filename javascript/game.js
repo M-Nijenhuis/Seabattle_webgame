@@ -69,11 +69,13 @@ function resetBoats() {
     }
   });
 
-  for (i = 0; i <= 5; i++) {
+  for (i = 0; i < 5; i++) {
     let button = document.getElementById(`chooseBoat${i}`);
     button.style.display = "flex";
-    let replaceButton = document.querySelector(".replaceBoat"); 
+    let replaceButton = document.getElementById(`replaceBoat${i}`);
+    replaceButton.style.display = "none";
   }
+
 }
 
 //This code loops true all the cellBlock and add an eventlistener with click and if clicked it fires the PlaceBlock funtion
