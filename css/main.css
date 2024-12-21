@@ -50,3 +50,15 @@ button:disabled {
 .replaceBoat:hover {
   background-color: darkred;
 }
+
+.startButtonContainer {
+  display: none;
+}
+
+#startButton {
+  background-color: red;
+  color: white;
+}
+#startButton:hover {
+  background-color: darkred;
+}

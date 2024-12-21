@@ -1,5 +1,6 @@
 // This is the variable that stores the player board
 const playerBoard = document.getElementById("player-board");
+const startButtonContainer = document.querySelector(".startButtonContainer");
 
 //This is the function that create all the block in the playerfield
 function CreateBoard(board) {
@@ -23,6 +24,8 @@ let isHorizontal = true;
 let boatIsChoosed = false;
 let currentHoveredCell = null;
 let boatNumber = 0;
+
+let placedBoats = 0;
 
 document.addEventListener("contextmenu", (event) => {
   event.preventDefault();
@@ -62,6 +65,7 @@ function setCurrentBoat(boatId, newBoatNumber) {
 }
 
 function resetBoats() {
+  placedBoats = 0;
   cellBlocks.forEach((cell) => {
     if (cell.classList.contains("placed")) {
       cell.classList.remove("placed");
@@ -157,6 +161,8 @@ function canPlaceBoat(startIndex, size) {
 //This function just maked the clicked block a red background color
 
 function placeBoat(startIndex, size, boatNumber) {
+  placedBoats++;
+
   for (let i = 0; i < size; i++) {
     let cellIndex;
 
@@ -175,9 +181,14 @@ function placeBoat(startIndex, size, boatNumber) {
     }
   }
   boatIsChoosed = false;
+
+  if (placedBoats === 5) {
+    startButtonContainer.style.display = "block";
+  }
 }
 
 function replaceBoat(boatNumber) {
+  placedBoats--;
   cellBlocks.forEach((cell) => {
     if (cell.classList.contains(`boat-${boatNumber}`)) {
       cell.classList.remove(`boat-${boatNumber}`);
@@ -185,6 +196,10 @@ function replaceBoat(boatNumber) {
       cell.style.backgroundColor = "#222";
     }
   });
+
+  if (placedBoats != 5) {
+    startButtonContainer.style.display = "none";
+  }
 
   setCurrentBoat(`chooseBoat${boatNumber}`, boatNumber);
 }
