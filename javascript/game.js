@@ -75,7 +75,6 @@ function resetBoats() {
     let replaceButton = document.getElementById(`replaceBoat${i}`);
     replaceButton.style.display = "none";
   }
-
 }
 
 //This code loops true all the cellBlock and add an eventlistener with click and if clicked it fires the PlaceBlock funtion
@@ -133,6 +132,8 @@ function highlightCells(startIndex, size, color) {
 }
 
 function canPlaceBoat(startIndex, size) {
+  const lineIndex = Math.floor(startIndex / 10);
+
   for (let i = 0; i < size; i++) {
     let cellIndex;
 
@@ -146,6 +147,8 @@ function canPlaceBoat(startIndex, size) {
 
     if (!cell || cell.classList.contains("placed")) {
       return false; // Can't place the boats
+    } else if (Math.floor(cellIndex / 10) != lineIndex && isHorizontal) {
+      return false;
     }
   }
   return true;
@@ -175,15 +178,13 @@ function placeBoat(startIndex, size, boatNumber) {
 }
 
 function replaceBoat(boatNumber) {
-
-  cellBlocks.forEach((cell => {
+  cellBlocks.forEach((cell) => {
     if (cell.classList.contains(`boat-${boatNumber}`)) {
       cell.classList.remove(`boat-${boatNumber}`);
       cell.classList.remove("placed");
       cell.style.backgroundColor = "#222";
     }
-  }));
+  });
 
   setCurrentBoat(`chooseBoat${boatNumber}`, boatNumber);
-
 }
