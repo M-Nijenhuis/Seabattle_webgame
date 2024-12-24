@@ -27,9 +27,9 @@ let boatNumber = 0;
 
 let placedBoats = 0;
 
-document.addEventListener("contextmenu", (event) => {
-  event.preventDefault();
-  if (isHorizontal === true) {
+//This code rotates the boat with a specific button press
+document.addEventListener("keydown", (event) => {
+  if (event.key === "r" && isHorizontal === true) {
     highlightCells(currentHoveredCell, currentBoatSize, "#222");
     isHorizontal = false;
     highlightCells(currentHoveredCell, currentBoatSize, "grey");
@@ -39,6 +39,20 @@ document.addEventListener("contextmenu", (event) => {
     highlightCells(currentHoveredCell, currentBoatSize, "grey");
   }
 });
+
+//This code rotates the boat with the right mouse button press
+//document.addEventListener("contextmenu", (event) => {
+//  event.preventDefault();
+//  if (isHorizontal === true) {
+//    highlightCells(currentHoveredCell, currentBoatSize, "#222");
+//    isHorizontal = false;
+//    highlightCells(currentHoveredCell, currentBoatSize, "grey");
+//  } else {
+//    highlightCells(currentHoveredCell, currentBoatSize, "#222");
+//    isHorizontal = true;
+//    highlightCells(currentHoveredCell, currentBoatSize, "grey");
+//  }
+//});
 
 function setCurrentBoat(boatId, newBoatNumber) {
   const pressedButton = document.getElementById(boatId);
@@ -162,6 +176,7 @@ function canPlaceBoat(startIndex, size) {
 
 function placeBoat(startIndex, size, boatNumber) {
   placedBoats++;
+  console.log("Placed boats:" + placedBoats);
 
   for (let i = 0; i < size; i++) {
     let cellIndex;
@@ -189,6 +204,7 @@ function placeBoat(startIndex, size, boatNumber) {
 
 function replaceBoat(boatNumber) {
   placedBoats--;
+  console.log("Placed boats:" + placedBoats);
   cellBlocks.forEach((cell) => {
     if (cell.classList.contains(`boat-${boatNumber}`)) {
       cell.classList.remove(`boat-${boatNumber}`);
@@ -202,4 +218,13 @@ function replaceBoat(boatNumber) {
   }
 
   setCurrentBoat(`chooseBoat${boatNumber}`, boatNumber);
+}
+
+function startGame() {
+  const enemyBoard = document.getElementById("enemy-board");
+  enemyBoard.style.display = "grid";
+
+  CreateBoard(enemyBoard);
+  //This are all the cell in the player field
+  const cellBlocks = document.querySelectorAll(".cell");
 }
