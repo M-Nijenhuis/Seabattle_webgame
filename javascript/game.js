@@ -3,16 +3,16 @@ const playerBoard = document.getElementById("player-board");
 const startButtonContainer = document.querySelector(".startButtonContainer");
 
 //This is the function that create all the block in the playerfield
-function CreateBoard(board) {
+function CreateBoard(board, cellName) {
   for (let i = 0; i < 100; i++) {
     const cell = document.createElement("div");
-    cell.classList.add("cell");
+    cell.classList.add(cellName);
     cell.dataset.index = i;
     board.appendChild(cell);
   }
 }
 
-CreateBoard(playerBoard);
+CreateBoard(playerBoard, "cell");
 
 //This are all the cell in the player field
 const cellBlocks = document.querySelectorAll(".cell");
@@ -222,9 +222,11 @@ function replaceBoat(boatNumber) {
 
 function startGame() {
   const enemyBoard = document.getElementById("enemy-board");
+  const chooseContainer = document.getElementById("choose-container");
   enemyBoard.style.display = "grid";
+  chooseContainer.style.display = "none";
 
-  CreateBoard(enemyBoard);
+  CreateBoard(enemyBoard, "enemy-cell");
   //This are all the cell in the player field
   const cellBlocks = document.querySelectorAll(".cell");
 }

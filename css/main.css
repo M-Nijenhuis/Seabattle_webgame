@@ -17,7 +17,7 @@ body {
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: repeat(10, 1fr);
   aspect-ratio: 1/1;
-  width: 90vmin;
+  width: 80vmin;
   max-height: 90vh;
   margin: auto;
   background-color: #ddd;
@@ -26,6 +26,10 @@ body {
 
 .cell {
   background-color: #222;
+  border: 1px solid #333;
+}
+.enemy-cell {
+  background-color: #272727;
   border: 1px solid #333;
 }
 
@@ -52,7 +56,7 @@ button:disabled {
 }
 
 .startButtonContainer {
-  display: none;
+  display: block;
 }
 
 #startButton {
