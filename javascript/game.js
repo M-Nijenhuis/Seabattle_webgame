@@ -24,12 +24,13 @@ let isHorizontal = true;
 let boatIsChoosed = false;
 let currentHoveredCell = null;
 let boatNumber = 0;
+let gameIsStarted = false;
 
 let placedBoats = 0;
 
 //This code rotates the boat with a specific button press
 document.addEventListener("keydown", (event) => {
-  if (event.key === "r" && isHorizontal === true) {
+  if (event.key === "r" && isHorizontal === true && !gameIsStarted) {
     highlightCells(currentHoveredCell, currentBoatSize, "#222");
     isHorizontal = false;
     highlightCells(currentHoveredCell, currentBoatSize, "grey");
@@ -226,7 +227,72 @@ function startGame() {
   enemyBoard.style.display = "grid";
   chooseContainer.style.display = "none";
 
+  //If the game start this boolean is true
+  gameIsStarted = true;
+
   CreateBoard(enemyBoard, "enemy-cell");
   //This are all the cell in the player field
   const cellBlocks = document.querySelectorAll(".cell");
+  placeEnemyBoats();
+}
+
+function placeEnemyBoats() {
+  const enemyCellBlocks = document.querySelectorAll(".enemy-cell");
+
+  let boats = [2, 3, 3, 4, 5];
+  outerLoop: for (let i = 0; i <= 5; i++) {
+    //boatSize is a random varible for the boat size that is placed
+    let boatIndex = Math.floor(Math.random() * boats.length);
+    let boatSize = boats[boatIndex];
+    console.log(boatSize);
+
+    console.log(boats);
+    boats.splice(boatIndex, 1);
+
+    let randomStartIndex = Math.floor(Math.random() * enemyCellBlocks.length);
+    let randomEnemyCell = enemyCellBlocks[randomStartIndex];
+    console.log(randomEnemyCell);
+
+    let randomDirectionBool = Math.random() < 0.5;
+    console.log(randomDirectionBool);
+
+    //Checks if the boat can place in one line
+    const lineIndex = Math.floor(randomStartIndex / 10);
+
+    for (let i = 0; i < boatSize; i++) {
+      let cellIndex;
+
+      if (randomDirectionBool) {
+        cellIndex = randomStartIndex + i;
+      } else {
+        cellIndex = randomStartIndex + i * 10;
+      }
+
+      const cell = cellBlocks[cellIndex];
+
+      if (!cell || cell.classList.contains("placed")) {
+        continue outerLoop;
+      } else if (Math.floor(cellIndex / 10) != lineIndex && isHorizontal) {
+        continue outerLoop;
+      }
+    }
+
+    for (let i = 0; i < boatSize; i++) {
+      let cellIndex;
+
+      if (randomDirectionBool) {
+        cellIndex = randomStartIndex + i;
+      } else {
+        cellIndex = randomStartIndex + i * 10;
+      }
+
+      const cell = enemyCellBlocks[cellIndex];
+
+      if (cell) {
+        cell.classList.add("placed");
+        cell.classList.add(`boat-${boatNumber}`);
+        cell.style.backgroundColor = "red";
+      }
+    }
+  }
 }
