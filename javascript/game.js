@@ -19,6 +19,7 @@ const cellBlocks = document.querySelectorAll(".cell");
 
 //All boats you have in the game
 let boats = [2, 3, 3, 4, 5];
+let enemyBoats = [2, 3, 3, 4, 5];
 let currentBoatSize = boats[0];
 let isHorizontal = true;
 let boatIsChoosed = false;
@@ -118,7 +119,7 @@ cellBlocks.forEach((cell) => {
   cell.addEventListener("click", () => {
     if (boatIsChoosed === true) {
       const cellIndex = parseInt(cell.dataset.index, 10);
-      if (canPlaceBoat(cellIndex, currentBoatSize)) {
+      if (canPlaceBoat(cellIndex, currentBoatSize, isHorizontal, cellBlocks)) {
         placeBoat(cellIndex, currentBoatSize, boatNumber);
         currentBoatSize = boats[0]; // Update naar de volgende boot
         if (!currentBoatSize) {
@@ -150,7 +151,7 @@ function highlightCells(startIndex, size, color) {
   }
 }
 
-function canPlaceBoat(startIndex, size) {
+function canPlaceBoat(startIndex, size, isHorizontal, cellBlocks) {
   const lineIndex = Math.floor(startIndex / 10);
 
   for (let i = 0; i < size; i++) {
@@ -236,46 +237,42 @@ function startGame() {
   placeEnemyBoats();
 }
 
+let colors = ["red", "blue", "orange", "pink", "green"];
+
 function placeEnemyBoats() {
+  // All cell blocks in one constant
   const enemyCellBlocks = document.querySelectorAll(".enemy-cell");
 
-  let boats = [2, 3, 3, 4, 5];
-  outerLoop: for (let i = 0; i <= 5; i++) {
+  for (let i = 0; i < 5; i++) {
     //boatSize is a random varible for the boat size that is placed
-    let boatIndex = Math.floor(Math.random() * boats.length);
-    let boatSize = boats[boatIndex];
-    console.log(boatSize);
+    let boatIndex = Math.floor(Math.random() * enemyBoats.length);
+    let boatSize = enemyBoats[boatIndex];
 
-    console.log(boats);
-    boats.splice(boatIndex, 1);
+    console.log(enemyBoats[boatIndex]);
+
+    //This deletes the boat that is placed
+    enemyBoats.splice(boatIndex, 1);
 
     let randomStartIndex = Math.floor(Math.random() * enemyCellBlocks.length);
-    let randomEnemyCell = enemyCellBlocks[randomStartIndex];
-    console.log(randomEnemyCell);
 
+    // This variable makes a random nuber between 0 and 1 and it is true under 0.5 that makes 50/50 change
     let randomDirectionBool = Math.random() < 0.5;
-    console.log(randomDirectionBool);
 
-    //Checks if the boat can place in one line
-    const lineIndex = Math.floor(randomStartIndex / 10);
+    do {
+      randomStartIndex = Math.floor(Math.random() * enemyCellBlocks.length);
+      randomDirectionBool = Math.random() < 0.5;
+    } while (
+      !canPlaceBoat(
+        randomStartIndex,
+        boatSize,
+        randomDirectionBool,
+        enemyCellBlocks,
+      )
+    );
 
-    for (let i = 0; i < boatSize; i++) {
-      let cellIndex;
-
-      if (randomDirectionBool) {
-        cellIndex = randomStartIndex + i;
-      } else {
-        cellIndex = randomStartIndex + i * 10;
-      }
-
-      const cell = cellBlocks[cellIndex];
-
-      if (!cell || cell.classList.contains("placed")) {
-        continue outerLoop;
-      } else if (Math.floor(cellIndex / 10) != lineIndex && isHorizontal) {
-        continue outerLoop;
-      }
-    }
+    console.log(`The canplaceboat option is ${canPlaceBoat(randomStartIndex, boatSize, randomDirectionBool, enemyCellBlocks)}`);
+    console.log(enemyCellBlocks[randomStartIndex]);
+    console.log(`isHorizontal is ${randomDirectionBool}`);
 
     for (let i = 0; i < boatSize; i++) {
       let cellIndex;
@@ -291,8 +288,10 @@ function placeEnemyBoats() {
       if (cell) {
         cell.classList.add("placed");
         cell.classList.add(`boat-${boatNumber}`);
-        cell.style.backgroundColor = "red";
+        cell.style.backgroundColor = colors[0];
       }
     }
+
+    colors.splice(0, 1);
   }
 }
