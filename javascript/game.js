@@ -16,6 +16,7 @@ CreateBoard(playerBoard, "cell");
 
 //This are all the cell in the player field
 const cellBlocks = document.querySelectorAll(".cell");
+const enemyCellBlocks = document.querySelectorAll(".enemy-cell");
 
 //All boats you have in the game
 let boats = [2, 3, 3, 4, 5];
@@ -102,7 +103,6 @@ cellBlocks.forEach((cell) => {
   cell.addEventListener("mouseenter", () => {
     if (boatIsChoosed === true) {
       const cellIndex = parseInt(cell.dataset.index, 10);
-      currentHoveredCell = cellIndex;
       if (!cell.classList.contains("placed")) {
         highlightCells(cellIndex, currentBoatSize, "grey");
       }
@@ -148,6 +148,23 @@ function highlightCells(startIndex, size, color) {
     if (cell != null && !cell.classList.contains("placed")) {
       cell.style.backgroundColor = color;
     }
+  }
+}
+
+function highlightBomb(cellIndex, cellBlocks, color) {
+  const cell = cellBlocks[cellIndex];
+
+  if (cell != null) {
+    cell.style.backgroundColor = color;
+  }
+}
+
+function placeBomb(cellIndex, cellBlocks, color) {
+  const cell = cellBlocks[cellIndex];
+
+  if (cell) {
+    cell.style.backgroundColor = color;
+    cell.classList.add("bombed");
   }
 }
 
@@ -232,9 +249,8 @@ function startGame() {
   gameIsStarted = true;
 
   CreateBoard(enemyBoard, "enemy-cell");
-  //This are all the cell in the player field
-  const cellBlocks = document.querySelectorAll(".cell");
   placeEnemyBoats();
+  enableBombThrowing();
 }
 
 let colors = ["red", "blue", "orange", "pink", "green"];
@@ -270,7 +286,9 @@ function placeEnemyBoats() {
       )
     );
 
-    console.log(`The canplaceboat option is ${canPlaceBoat(randomStartIndex, boatSize, randomDirectionBool, enemyCellBlocks)}`);
+    console.log(
+      `The canplaceboat option is ${canPlaceBoat(randomStartIndex, boatSize, randomDirectionBool, enemyCellBlocks)}`,
+    );
     console.log(enemyCellBlocks[randomStartIndex]);
     console.log(`isHorizontal is ${randomDirectionBool}`);
 
@@ -294,4 +312,30 @@ function placeEnemyBoats() {
 
     colors.splice(0, 1);
   }
+}
+
+function enableBombThrowing() {
+  console.log("Hello");
+  const enemyCellBlocks = document.querySelectorAll(".enemy-cell");
+  console.log(enemyCellBlocks);
+
+  enemyCellBlocks.forEach((cell) => {
+    cell.addEventListener("mouseenter", () => {
+      const cellIndex = parseInt(cell.dataset.index, 10);
+      highlightBomb(cellIndex, enemyCellBlocks, "grey");
+    });
+
+    cell.addEventListener("mouseleave", () => {
+      const cellIndex = parseInt(cell.dataset.index, 10);
+
+      if (!cell.classList.contains("bombed")) {
+        highlightBomb(cellIndex, enemyCellBlocks, "#272727");
+      }
+    });
+
+    cell.addEventListener("click", () => {
+      const cellIndex = parseInt(cell.dataset.index, 10);
+      placeBomb(cellIndex, enemyCellBlocks, "lightblue");
+    });
+  });
 }
