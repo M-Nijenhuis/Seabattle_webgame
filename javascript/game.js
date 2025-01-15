@@ -165,8 +165,13 @@ function placeBomb(cellIndex, cellBlocks, color) {
   const cell = cellBlocks[cellIndex];
 
   if (cell) {
-    cell.style.backgroundColor = color;
-    cell.classList.add("bombed");
+    if (cell.classList.contains("placed")) {
+      cell.style.backgroundColor = "purple";
+      cell.classList.add("bombed");
+    } else {
+      cell.classList.add("bombed");
+      cell.style.backgroundColor = color;
+    }
   }
 }
 
