@@ -103,6 +103,7 @@ cellBlocks.forEach((cell) => {
   cell.addEventListener("mouseenter", () => {
     if (boatIsChoosed === true) {
       const cellIndex = parseInt(cell.dataset.index, 10);
+      currentHoveredCell = cellIndex;
       if (!cell.classList.contains("placed")) {
         highlightCells(cellIndex, currentBoatSize, "grey");
       }
@@ -111,6 +112,7 @@ cellBlocks.forEach((cell) => {
 
   cell.addEventListener("mouseleave", () => {
     const cellIndex = parseInt(cell.dataset.index, 10);
+    const hoverCell = cellBlocks[cellIndex];
     if (!cell.classList.contains("placed")) {
       highlightCells(cellIndex, currentBoatSize, "#222");
     }
@@ -310,6 +312,7 @@ function placeEnemyBoats() {
       }
     }
 
+    boatNumber++;
     colors.splice(0, 1);
   }
 }
@@ -322,7 +325,9 @@ function enableBombThrowing() {
   enemyCellBlocks.forEach((cell) => {
     cell.addEventListener("mouseenter", () => {
       const cellIndex = parseInt(cell.dataset.index, 10);
-      highlightBomb(cellIndex, enemyCellBlocks, "grey");
+      if (!cell.classList.contains("bombed")) {
+        highlightBomb(cellIndex, enemyCellBlocks, "grey");
+      }
     });
 
     cell.addEventListener("mouseleave", () => {
