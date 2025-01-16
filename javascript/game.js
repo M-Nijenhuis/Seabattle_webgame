@@ -326,17 +326,21 @@ function enableBombThrowing() {
   if (isPlayerTurn) {
     enemyCellBlocks.forEach((cell) => {
       cell.addEventListener("mouseenter", () => {
-        const cellIndex = parseInt(cell.dataset.index, 10);
-        if (!cell.classList.contains("bombed")) {
-          highlightBomb(cellIndex, enemyCellBlocks, "grey");
+        if (isPlayerTurn === true) {
+          const cellIndex = parseInt(cell.dataset.index, 10);
+          if (!cell.classList.contains("bombed")) {
+            highlightBomb(cellIndex, enemyCellBlocks, "grey");
+          }
         }
       });
 
       cell.addEventListener("mouseleave", () => {
-        const cellIndex = parseInt(cell.dataset.index, 10);
+        if (isPlayerTurn === true) {
+          const cellIndex = parseInt(cell.dataset.index, 10);
 
-        if (!cell.classList.contains("bombed")) {
-          highlightBomb(cellIndex, enemyCellBlocks, "#272727");
+          if (!cell.classList.contains("bombed")) {
+            highlightBomb(cellIndex, enemyCellBlocks, "#272727");
+          }
         }
       });
 
