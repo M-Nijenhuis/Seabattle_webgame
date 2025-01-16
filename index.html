@@ -9,9 +9,17 @@
 </head>
 
 <body>
-  <div id="game">
-    <div id="player-board" class="board"></div>
-    <div id="enemy-board" class="board" style="display: none"></div>
+
+  <div class="container">
+    <div class="player-turn-container">
+      <h2 id="turn-text"></h2>
+    </div>
+
+
+    <div id="game">
+      <div id="player-board" class="board"></div>
+      <div id="enemy-board" class="board" style="display: none"></div>
+    </div>
   </div>
 
   <div class="choose-container" id="choose-container">
@@ -62,7 +70,9 @@
 
     <div class="startButtonContainer">
       <h3>Start the game</h3>
-      <button id="startButton" type="submit" onclick="startGame()">START</button>
+      <button id="startButton" type="submit" onclick="startGame()">
+        START
+      </button>
     </div>
   </div>
 

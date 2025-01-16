@@ -6,11 +6,25 @@ body {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
+.container {
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 #game {
   display: flex;
   justify-content: center;
   gap: 50px;
   margin: 20px auto;
+}
+
+.player-turn-container {
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: center;
 }
 
 .board {

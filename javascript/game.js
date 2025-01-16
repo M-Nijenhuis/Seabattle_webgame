@@ -1,6 +1,7 @@
 // This is the variable that stores the player board
 const playerBoard = document.getElementById("player-board");
 const startButtonContainer = document.querySelector(".startButtonContainer");
+const turnTextElement = document.querySelector("#turn-text");
 
 //This is the function that create all the block in the playerfield
 function CreateBoard(board, cellName) {
@@ -18,6 +19,9 @@ CreateBoard(playerBoard, "cell");
 const cellBlocks = document.querySelectorAll(".cell");
 const enemyCellBlocks = document.querySelectorAll(".enemy-cell");
 
+const _playerTurnString = "Your Turn!";
+const _aiTurnString = "It's the enemy's turn";
+
 //All boats you have in the game
 let boats = [2, 3, 3, 4, 5];
 let enemyBoats = [2, 3, 3, 4, 5];
@@ -27,16 +31,22 @@ let boatIsChoosed = false;
 let currentHoveredCell = null;
 let boatNumber = 0;
 let gameIsStarted = false;
+let isPlayerTurn = true;
 
 let placedBoats = 0;
 
 //This code rotates the boat with a specific button press
 document.addEventListener("keydown", (event) => {
-  if (event.key === "r" && isHorizontal === true && !gameIsStarted) {
+  if (
+    event.key === "r" &&
+    isHorizontal === true &&
+    !gameIsStarted &&
+    boatIsChoosed
+  ) {
     highlightCells(currentHoveredCell, currentBoatSize, "#222");
     isHorizontal = false;
     highlightCells(currentHoveredCell, currentBoatSize, "grey");
-  } else {
+  } else if (boatIsChoosed) {
     highlightCells(currentHoveredCell, currentBoatSize, "#222");
     isHorizontal = true;
     highlightCells(currentHoveredCell, currentBoatSize, "grey");
@@ -70,12 +80,10 @@ function setCurrentBoat(boatId, newBoatNumber) {
     throw new Error("Geen getal");
   }
 
-  console.log(boatIndex);
   currentBoatSize = boats[boatIndex];
   boatIsChoosed = true;
 
   boatNumber = newBoatNumber;
-  console.log(newBoatNumber, boatNumber);
 
   const replaceButton = document.getElementById(`replaceBoat${boatIndex}`);
   replaceButton.style.display = "flex";
@@ -125,10 +133,8 @@ cellBlocks.forEach((cell) => {
         placeBoat(cellIndex, currentBoatSize, boatNumber);
         currentBoatSize = boats[0]; // Update naar de volgende boot
         if (!currentBoatSize) {
-          console.log("Alle boten zijn geplaatst!");
         }
       } else {
-        console.log("Kan de boot hier niet plaatsen!");
       }
     }
   });
@@ -202,7 +208,6 @@ function canPlaceBoat(startIndex, size, isHorizontal, cellBlocks) {
 
 function placeBoat(startIndex, size, boatNumber) {
   placedBoats++;
-  console.log("Placed boats:" + placedBoats);
 
   for (let i = 0; i < size; i++) {
     let cellIndex;
@@ -230,7 +235,6 @@ function placeBoat(startIndex, size, boatNumber) {
 
 function replaceBoat(boatNumber) {
   placedBoats--;
-  console.log("Placed boats:" + placedBoats);
   cellBlocks.forEach((cell) => {
     if (cell.classList.contains(`boat-${boatNumber}`)) {
       cell.classList.remove(`boat-${boatNumber}`);
@@ -271,8 +275,6 @@ function placeEnemyBoats() {
     let boatIndex = Math.floor(Math.random() * enemyBoats.length);
     let boatSize = enemyBoats[boatIndex];
 
-    console.log(enemyBoats[boatIndex]);
-
     //This deletes the boat that is placed
     enemyBoats.splice(boatIndex, 1);
 
@@ -292,12 +294,6 @@ function placeEnemyBoats() {
         enemyCellBlocks,
       )
     );
-
-    console.log(
-      `The canplaceboat option is ${canPlaceBoat(randomStartIndex, boatSize, randomDirectionBool, enemyCellBlocks)}`,
-    );
-    console.log(enemyCellBlocks[randomStartIndex]);
-    console.log(`isHorizontal is ${randomDirectionBool}`);
 
     for (let i = 0; i < boatSize; i++) {
       let cellIndex;
@@ -320,32 +316,74 @@ function placeEnemyBoats() {
     boatNumber++;
     colors.splice(0, 1);
   }
+
+  turnTextElement.innerText = _playerTurnString;
 }
 
 function enableBombThrowing() {
-  console.log("Hello");
   const enemyCellBlocks = document.querySelectorAll(".enemy-cell");
-  console.log(enemyCellBlocks);
 
-  enemyCellBlocks.forEach((cell) => {
-    cell.addEventListener("mouseenter", () => {
-      const cellIndex = parseInt(cell.dataset.index, 10);
-      if (!cell.classList.contains("bombed")) {
-        highlightBomb(cellIndex, enemyCellBlocks, "grey");
+  if (isPlayerTurn) {
+    enemyCellBlocks.forEach((cell) => {
+      cell.addEventListener("mouseenter", () => {
+        const cellIndex = parseInt(cell.dataset.index, 10);
+        if (!cell.classList.contains("bombed")) {
+          highlightBomb(cellIndex, enemyCellBlocks, "grey");
+        }
+      });
+
+      cell.addEventListener("mouseleave", () => {
+        const cellIndex = parseInt(cell.dataset.index, 10);
+
+        if (!cell.classList.contains("bombed")) {
+          highlightBomb(cellIndex, enemyCellBlocks, "#272727");
+        }
+      });
+
+      cell.addEventListener("click", () => {
+        if (isPlayerTurn === true && !cell.classList.contains("bombed")) {
+          const cellIndex = parseInt(cell.dataset.index, 10);
+          placeBomb(cellIndex, enemyCellBlocks, "lightblue");
+          isPlayerTurn = false;
+          setTimeout(throwEnemyBomb, 1500);
+          turnTextElement.innerText = _aiTurnString;
+        }
+      });
+    });
+  }
+}
+
+function throwEnemyBomb() {
+  let cellIndex;
+  let cell;
+  let lastThrowedBomb;
+
+  do {
+    cellIndex = Math.floor(Math.random() * cellBlocks.length);
+    cell = cellBlocks[cellIndex];
+  } while (cell != null && cell.classList.contains("enemy-bombed"));
+
+  let allThrowedBombs = document.querySelectorAll(".enemy-bombed");
+
+  if (allThrowedBombs != null) {
+    for (let i = 0; i < allThrowedBombs.length; i++) {
+      if (!allThrowedBombs[i].classList.contains("placed")) {
+        allThrowedBombs[i].style.backgroundColor = "lightblue";
+        console.log(allThrowedBombs[i]);
       }
-    });
+    }
+  }
 
-    cell.addEventListener("mouseleave", () => {
-      const cellIndex = parseInt(cell.dataset.index, 10);
+  if (cell.classList.contains("placed")) {
+    cell.classList.add("enemy-bombed");
+    cell.style.backgroundColor = "purple";
+  } else {
+    cell.classList.add("enemy-bombed");
+    cell.style.backgroundColor = "lightblue";
+    lastThrowedBomb = cell;
+    lastThrowedBomb.style.backgroundColor = "green";
+  }
 
-      if (!cell.classList.contains("bombed")) {
-        highlightBomb(cellIndex, enemyCellBlocks, "#272727");
-      }
-    });
-
-    cell.addEventListener("click", () => {
-      const cellIndex = parseInt(cell.dataset.index, 10);
-      placeBomb(cellIndex, enemyCellBlocks, "lightblue");
-    });
-  });
+  isPlayerTurn = true;
+  turnTextElement.innerText = _playerTurnString;
 }
