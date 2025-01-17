@@ -32,6 +32,7 @@ let currentHoveredCell = null;
 let boatNumber = 0;
 let gameIsStarted = false;
 let isPlayerTurn = true;
+let lastThrowedBomb;
 
 let placedBoats = 0;
 
@@ -360,11 +361,48 @@ function enableBombThrowing() {
 function throwEnemyBomb() {
   let cellIndex;
   let cell;
-  let lastThrowedBomb;
+  let nearbyCells = [];
+
+  console.log(lastThrowedBomb);
 
   do {
-    cellIndex = Math.floor(Math.random() * cellBlocks.length);
-    cell = cellBlocks[cellIndex];
+    try {
+      if (lastThrowedBomb && lastThrowedBomb.classList.contains("placed")) {
+        console.log("Er is een bom geraakt en we gaan zoeken voor een buurman");
+
+        const lastBombCellIndex = parseInt(lastThrowedBomb.dataset.index, 10);
+        console.log(lastBombCellIndex);
+
+        const _top = lastBombCellIndex - 10;
+        const _bottom = lastBombCellIndex + 10;
+        const _left = lastBombCellIndex - 1;
+        const _right = lastBombCellIndex + 1;
+
+        if (_top >= 0) nearbyCells.push(_top);
+        if (_bottom < 100) nearbyCells.push(_bottom);
+        if (_left >= 0 && lastBombCellIndex % 10 !== 0) nearbyCells.push(_left);
+        if (_right < 100 && lastBombCellIndex % 10 !== 9)
+          nearbyCells.push(_right);
+
+        console.log(nearbyCells);
+        if (nearbyCells.length > 0) {
+          const randomIndex = Math.floor(Math.random() * nearbyCells.length);
+          cellIndex = nearbyCells[randomIndex];
+          cell = cellBlocks[cellIndex];
+          console.log("The near cell is" + cell);
+        }
+      }
+
+      if (!cell) {
+        console.log("There is no cell");
+        cellIndex = Math.floor(Math.random() * cellBlocks.length);
+        cell = cellBlocks[cellIndex];
+      }
+    } catch (error) {
+      console.log(error);
+      cellIndex = Math.floor(Math.random() * cellBlocks.length);
+      cell = cellBlocks[cellIndex];
+    }
   } while (cell != null && cell.classList.contains("enemy-bombed"));
 
   let allThrowedBombs = document.querySelectorAll(".enemy-bombed");
@@ -373,7 +411,6 @@ function throwEnemyBomb() {
     for (let i = 0; i < allThrowedBombs.length; i++) {
       if (!allThrowedBombs[i].classList.contains("placed")) {
         allThrowedBombs[i].style.backgroundColor = "lightblue";
-        console.log(allThrowedBombs[i]);
       }
     }
   }
@@ -381,6 +418,7 @@ function throwEnemyBomb() {
   if (cell.classList.contains("placed")) {
     cell.classList.add("enemy-bombed");
     cell.style.backgroundColor = "purple";
+    lastThrowedBomb = cell;
   } else {
     cell.classList.add("enemy-bombed");
     cell.style.backgroundColor = "lightblue";
