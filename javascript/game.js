@@ -3,6 +3,46 @@ const playerBoard = document.getElementById("player-board");
 const startButtonContainer = document.querySelector(".startButtonContainer");
 const turnTextElement = document.querySelector("#turn-text");
 
+//All buttons for choose boats
+const _boat1ReplaceButton = document.querySelector("#replaceBoat0");
+const _boat2ReplaceButton = document.querySelector("#replaceBoat1");
+const _boat3ReplaceButton = document.querySelector("#replaceBoat2");
+const _boat4ReplaceButton = document.querySelector("#replaceBoat3");
+const _boat5ReplaceButton = document.querySelector("#replaceBoat4");
+
+//Add a mouseover event to all buttons
+_boat1ReplaceButton.addEventListener("mouseover", () => {
+  makeBoatDarker(0, "darkred");
+});
+_boat2ReplaceButton.addEventListener("mouseover", () => {
+  makeBoatDarker(1, "darkred");
+});
+_boat3ReplaceButton.addEventListener("mouseover", () => {
+  makeBoatDarker(2, "darkred");
+});
+_boat4ReplaceButton.addEventListener("mouseover", () => {
+  makeBoatDarker(3, "darkred");
+});
+_boat5ReplaceButton.addEventListener("mouseover", () => {
+  makeBoatDarker(4, "darkred");
+});
+
+_boat1ReplaceButton.addEventListener("mouseleave", () => {
+  makeBoatDarker(0, "red");
+});
+_boat2ReplaceButton.addEventListener("mouseleave", () => {
+  makeBoatDarker(1, "red");
+});
+_boat3ReplaceButton.addEventListener("mouseleave", () => {
+  makeBoatDarker(2, "red");
+});
+_boat4ReplaceButton.addEventListener("mouseleave", () => {
+  makeBoatDarker(3, "red");
+});
+_boat5ReplaceButton.addEventListener("mouseleave", () => {
+  makeBoatDarker(4, "red");
+});
+
 //This is the function that create all the block in the playerfield
 function CreateBoard(board, cellName) {
   for (let i = 0; i < 100; i++) {
@@ -97,7 +137,13 @@ function resetBoats() {
       cell.classList.remove("placed");
       cell.style.backgroundColor = "#222";
     }
-  });
+
+    for (let i = 0; i <= 5; i++) {
+      if (cell.classList.contains(`boat-${i}`)) {
+        cell.classList.remove(`boat-${i}`);
+      }
+    }
+    });
 
   for (i = 0; i < 5; i++) {
     let button = document.getElementById(`chooseBoat${i}`);
@@ -140,6 +186,14 @@ cellBlocks.forEach((cell) => {
     }
   });
 });
+
+function makeBoatDarker(boatIndex, color) {
+  cellBlocks.forEach((cell) => {
+    if (cell.classList.contains(`boat-${boatIndex}`)) {
+      cell.style.backgroundColor = color;
+    }
+  });
+}
 
 function highlightCells(startIndex, size, color) {
   // This code happens for all de divs (also the size)
@@ -358,10 +412,12 @@ function enableBombThrowing() {
   }
 }
 
+let nearbyCells = [];
+
 function throwEnemyBomb() {
   let cellIndex;
+  let _randomIndex;
   let cell;
-  let nearbyCells = [];
 
   console.log(lastThrowedBomb);
 
@@ -386,8 +442,8 @@ function throwEnemyBomb() {
 
         console.log(nearbyCells);
         if (nearbyCells.length > 0) {
-          const randomIndex = Math.floor(Math.random() * nearbyCells.length);
-          cellIndex = nearbyCells[randomIndex];
+          _randomIndex = Math.floor(Math.random() * nearbyCells.length);
+          cellIndex = nearbyCells[_randomIndex];
           cell = cellBlocks[cellIndex];
           console.log("The near cell is" + cell);
         }
@@ -428,4 +484,9 @@ function throwEnemyBomb() {
 
   isPlayerTurn = true;
   turnTextElement.innerText = _playerTurnString;
+
+  if (nearbyCells.length > 0) {
+    nearbyCells.splice(_randomIndex, 1);
+    console.log(nearbyCells);
+  }
 }
