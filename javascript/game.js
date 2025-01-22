@@ -362,14 +362,7 @@ function placeEnemyBoats() {
     do {
       randomStartIndex = Math.floor(Math.random() * enemyCellBlocks.length);
       randomDirectionBool = Math.random() < 0.5;
-    } while (
-      !canPlaceBoat(
-        randomStartIndex,
-        boatSize,
-        randomDirectionBool,
-        enemyCellBlocks,
-      )
-    );
+    } while (!canPlaceBoat( randomStartIndex, boatSize, randomDirectionBool, enemyCellBlocks,));
 
     for (let i = 0; i < boatSize; i++) {
       let cellIndex;
@@ -385,7 +378,7 @@ function placeEnemyBoats() {
       if (cell) {
         cell.classList.add("placed");
         cell.classList.add(`boat-${boatNumber}`);
-        cell.style.backgroundColor = colors[0];
+        //cell.style.backgroundColor = colors[0];
       }
     }
 
@@ -454,15 +447,13 @@ function throwEnemyBomb() {
         cell = currentBoatCells[0];
         console.log(cell);
         nearbyCells = [];
+        foundBoatIndex = [];
       } else if (nearbyCells.length > 0) {
         randomIndex = Math.floor(Math.random() * nearbyCells.length);
         cellIndex = nearbyCells[randomIndex];
         cell = cellBlocks[cellIndex];
         console.log("The near cell is" + cell);
-      } else if (
-        lastThrowedBomb &&
-        lastThrowedBomb.classList.contains("placed")
-      ) {
+      } else if (lastThrowedBomb && lastThrowedBomb.classList.contains("placed")) {
         console.log("Er is een bom geraakt en we gaan zoeken voor een buurman");
 
         const lastBombCellIndex = parseInt(lastThrowedBomb.dataset.index, 10);
@@ -484,7 +475,11 @@ function throwEnemyBomb() {
           nearbyCells.push(_top);
         if (_bottom < 100 && !_bottomCell.classList.contains("enemy-bombed"))
           nearbyCells.push(_bottom);
-        if ( _left >= 0 && lastBombCellIndex % 10 !== 0 && !_leftCell.classList.contains("enemy-bombed"))
+        if (
+          _left >= 0 &&
+          lastBombCellIndex % 10 !== 0 &&
+          !_leftCell.classList.contains("enemy-bombed")
+        )
           nearbyCells.push(_left);
         if (
           _right < 100 &&
@@ -528,7 +523,8 @@ function throwEnemyBomb() {
   if (allThrowedBombs != null) {
     for (let i = 0; i < allThrowedBombs.length; i++) {
       if (!allThrowedBombs[i].classList.contains("placed")) {
-        const greenHitColor = allThrowedBombs[i].querySelector(".last-hit-bomb");
+        const greenHitColor =
+          allThrowedBombs[i].querySelector(".last-hit-bomb");
         const normalHitColor = allThrowedBombs[i].querySelector(".miss-bomb");
         console.log("Where in");
         if (greenHitColor) {
