@@ -40,12 +40,44 @@ body {
 }
 
 .cell {
-  background-color: #222;
+  background-color: #276786;
   border: 1px solid #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .enemy-cell {
-  background-color: #272727;
+  background-color: #276786;
   border: 1px solid #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hit-bomb {
+  width: 35%;
+  height: 35%;
+  border-radius: 50%;
+  background-color: red;
+}
+.miss-bomb {
+  width: 35%;
+  height: 35%;
+  border-radius: 50%;
+  background-color: white;
+}
+.hover-bomb {
+  width: 35%;
+  height: 35%;
+  border-radius: 50%;
+  background-color: white;
+  opacity: 50%;
+}
+.last-hit-bomb {
+  width: 35%;
+  height: 35%;
+  border-radius: 50%;
+  background-color: white;
 }
 
 button {

@@ -10,6 +10,12 @@ const _boat3ReplaceButton = document.querySelector("#replaceBoat2");
 const _boat4ReplaceButton = document.querySelector("#replaceBoat3");
 const _boat5ReplaceButton = document.querySelector("#replaceBoat4");
 
+//Bomb
+const _hitBombHTML = '<div class="hit-bomb"></div>';
+const _missBombHTML = '<div class="miss-bomb"></div>';
+const _hoverBombHTML = '<div class="hover-bomb"></div>';
+const _lastHitBombHTML = '<div class="last-hit-bomb"></div>';
+
 //Add a mouseover event to all buttons
 _boat1ReplaceButton.addEventListener("mouseover", () => {
   makeBoatDarker(0, "darkred");
@@ -28,19 +34,19 @@ _boat5ReplaceButton.addEventListener("mouseover", () => {
 });
 
 _boat1ReplaceButton.addEventListener("mouseleave", () => {
-  makeBoatDarker(0, "red");
+  makeBoatDarker(0, "#c4c4c4");
 });
 _boat2ReplaceButton.addEventListener("mouseleave", () => {
-  makeBoatDarker(1, "red");
+  makeBoatDarker(1, "#c4c4c4");
 });
 _boat3ReplaceButton.addEventListener("mouseleave", () => {
-  makeBoatDarker(2, "red");
+  makeBoatDarker(2, "#c4c4c4");
 });
 _boat4ReplaceButton.addEventListener("mouseleave", () => {
-  makeBoatDarker(3, "red");
+  makeBoatDarker(3, "#c4c4c4");
 });
 _boat5ReplaceButton.addEventListener("mouseleave", () => {
-  makeBoatDarker(4, "red");
+  makeBoatDarker(4, "#c4c4c4");
 });
 
 //This is the function that create all the block in the playerfield
@@ -84,11 +90,11 @@ document.addEventListener("keydown", (event) => {
     !gameIsStarted &&
     boatIsChoosed
   ) {
-    highlightCells(currentHoveredCell, currentBoatSize, "#222");
+    highlightCells(currentHoveredCell, currentBoatSize, "#276786");
     isHorizontal = false;
     highlightCells(currentHoveredCell, currentBoatSize, "grey");
   } else if (boatIsChoosed) {
-    highlightCells(currentHoveredCell, currentBoatSize, "#222");
+    highlightCells(currentHoveredCell, currentBoatSize, "#276786");
     isHorizontal = true;
     highlightCells(currentHoveredCell, currentBoatSize, "grey");
   }
@@ -169,7 +175,7 @@ cellBlocks.forEach((cell) => {
     const cellIndex = parseInt(cell.dataset.index, 10);
     const hoverCell = cellBlocks[cellIndex];
     if (!cell.classList.contains("placed")) {
-      highlightCells(cellIndex, currentBoatSize, "#222");
+      highlightCells(cellIndex, currentBoatSize, "#276786");
     }
   });
 
@@ -214,11 +220,21 @@ function highlightCells(startIndex, size, color) {
   }
 }
 
-function highlightBomb(cellIndex, cellBlocks, color) {
+function highlightBomb(cellIndex, cellBlocks, show) {
   const cell = cellBlocks[cellIndex];
 
-  if (cell != null) {
-    cell.style.backgroundColor = color;
+  if (show === true) {
+    if (cell != null) {
+      cell.innerHTML += _hoverBombHTML;
+    }
+  } else {
+    if (cell != null) {
+      const hoverBomb = cell.querySelector(".hover-bomb");
+      if (hoverBomb) {
+        // Controleer of hoverBomb bestaat
+        hoverBomb.remove();
+      }
+    }
   }
 }
 
@@ -227,11 +243,13 @@ function placeBomb(cellIndex, cellBlocks, color) {
 
   if (cell) {
     if (cell.classList.contains("placed")) {
-      cell.style.backgroundColor = "purple";
+      cell.style.backgroundColor = "#c4c4c4";
       cell.classList.add("bombed");
+      cell.innerHTML += _hitBombHTML;
     } else {
       cell.classList.add("bombed");
       cell.style.backgroundColor = color;
+      cell.innerHTML += _missBombHTML;
     }
   }
 }
@@ -278,7 +296,7 @@ function placeBoat(startIndex, size, boatNumber) {
     if (cell) {
       cell.classList.add("placed");
       cell.classList.add(`boat-${boatNumber}`);
-      cell.style.backgroundColor = "red";
+      cell.style.backgroundColor = "#c4c4c4";
     }
   }
   boatIsChoosed = false;
@@ -384,7 +402,7 @@ function enableBombThrowing() {
         if (isPlayerTurn === true) {
           const cellIndex = parseInt(cell.dataset.index, 10);
           if (!cell.classList.contains("bombed")) {
-            highlightBomb(cellIndex, enemyCellBlocks, "grey");
+            highlightBomb(cellIndex, enemyCellBlocks, true);
           }
         }
       });
@@ -394,7 +412,7 @@ function enableBombThrowing() {
           const cellIndex = parseInt(cell.dataset.index, 10);
 
           if (!cell.classList.contains("bombed")) {
-            highlightBomb(cellIndex, enemyCellBlocks, "#272727");
+            highlightBomb(cellIndex, enemyCellBlocks, false);
           }
         }
       });
@@ -402,7 +420,8 @@ function enableBombThrowing() {
       cell.addEventListener("click", () => {
         if (isPlayerTurn === true && !cell.classList.contains("bombed")) {
           const cellIndex = parseInt(cell.dataset.index, 10);
-          placeBomb(cellIndex, enemyCellBlocks, "lightblue");
+          highlightBomb(cellIndex, enemyCellBlocks, false);
+          placeBomb(cellIndex, enemyCellBlocks, "#276786");
           isPlayerTurn = false;
           setTimeout(throwEnemyBomb, 1500);
           turnTextElement.innerText = _aiTurnString;
@@ -507,17 +526,17 @@ function throwEnemyBomb() {
   lastThrowedBomb = cell;
   let allThrowedBombs = document.querySelectorAll(".enemy-bombed");
 
-  if (allThrowedBombs != null) {
-    for (let i = 0; i < allThrowedBombs.length; i++) {
-      if (!allThrowedBombs[i].classList.contains("placed")) {
-        allThrowedBombs[i].style.backgroundColor = "lightblue";
-      }
-    }
-  }
+  //if (allThrowedBombs != null) {
+  //  for (let i = 0; i < allThrowedBombs.length; i++) {
+  //    if (!allThrowedBombs[i].classList.contains("placed")) {
+  //      allThrowedBombs[i].innerHTML += _missBombHTML;
+  //    }
+  //  }
+  //}
 
   if (cell.classList.contains("placed")) {
     cell.classList.add("enemy-bombed");
-    cell.style.backgroundColor = "purple";
+    cell.innerHTML += _hitBombHTML;
     lastThrowedBomb = cell;
 
     // Zoek naar de 'boat-?' class
@@ -543,9 +562,8 @@ function throwEnemyBomb() {
     lastHitBoatIndex = boatClass;
   } else {
     cell.classList.add("enemy-bombed");
-    cell.style.backgroundColor = "lightblue";
+    cell.innerHTML += _missBombHTML
     lastThrowedBomb = cell;
-    lastThrowedBomb.style.backgroundColor = "green";
   }
 
   isPlayerTurn = true;
