@@ -143,7 +143,7 @@ function resetBoats() {
         cell.classList.remove(`boat-${i}`);
       }
     }
-    });
+  });
 
   for (i = 0; i < 5; i++) {
     let button = document.getElementById(`chooseBoat${i}`);
@@ -413,17 +413,36 @@ function enableBombThrowing() {
 }
 
 let nearbyCells = [];
+let currentBoat = null;
+let currentBoatCells = [];
 
 function throwEnemyBomb() {
   let cellIndex;
-  let _randomIndex;
+  let randomIndex;
   let cell;
+  let differentBoatHit = false;
+  let lastHitBoatIndex;
 
-  console.log(lastThrowedBomb);
+  console.log("This is the lastthrowedbomb", lastThrowedBomb);
+  console.log("This is the currentBoatCells", currentBoatCells);
 
   do {
     try {
-      if (lastThrowedBomb && lastThrowedBomb.classList.contains("placed")) {
+      if (currentBoatCells.length > 0) {
+        cellIndex = currentBoatCells[0];
+        cell = cellBlocks[cellIndex];
+        nearbyCells = [];
+
+        console.log("There need a current boat to be hit");
+      } else if (nearbyCells.length > 0) {
+        randomIndex = Math.floor(Math.random() * nearbyCells.length);
+        cellIndex = nearbyCells[randomIndex];
+        cell = cellBlocks[cellIndex];
+        console.log("The near cell is" + cell);
+      } else if (
+        lastThrowedBomb &&
+        lastThrowedBomb.classList.contains("placed")
+      ) {
         console.log("Er is een bom geraakt en we gaan zoeken voor een buurman");
 
         const lastBombCellIndex = parseInt(lastThrowedBomb.dataset.index, 10);
@@ -434,22 +453,42 @@ function throwEnemyBomb() {
         const _left = lastBombCellIndex - 1;
         const _right = lastBombCellIndex + 1;
 
-        if (_top >= 0) nearbyCells.push(_top);
-        if (_bottom < 100) nearbyCells.push(_bottom);
-        if (_left >= 0 && lastBombCellIndex % 10 !== 0) nearbyCells.push(_left);
-        if (_right < 100 && lastBombCellIndex % 10 !== 9)
+        const _topCell = cellBlocks[_top];
+        const _bottomCell = cellBlocks[_bottom];
+        const _leftCell = cellBlocks[_left];
+        const _rightCell = cellBlocks[_right];
+
+        if (_top >= 0 && !_topCell.classList.contains("enemy-bombed"))
+          nearbyCells.push(_top);
+        if (_bottom < 100 && !_bottomCell.classList.contains("enemy-bombed"))
+          nearbyCells.push(_bottom);
+        if (
+          _left >= 0 &&
+          lastBombCellIndex % 10 !== 0 &&
+          !_leftCell.classList.contains("enemy-bombed")
+        )
+          nearbyCells.push(_left);
+        if (
+          _right < 100 &&
+          lastBombCellIndex % 10 !== 9 &&
+          !_rightCell.classList.contains("enemy-bombed")
+        )
           nearbyCells.push(_right);
 
         console.log(nearbyCells);
         if (nearbyCells.length > 0) {
-          _randomIndex = Math.floor(Math.random() * nearbyCells.length);
-          cellIndex = nearbyCells[_randomIndex];
+          randomIndex = Math.floor(Math.random() * nearbyCells.length);
+          cellIndex = nearbyCells[randomIndex];
           cell = cellBlocks[cellIndex];
           console.log("The near cell is" + cell);
         }
+      } else {
+        cellIndex = Math.floor(Math.random() * cellBlocks.length);
+        cell = cellBlocks[cellIndex];
+        lastThrowedBomb = cell;
       }
 
-      if (!cell) {
+      if (cell == null) {
         console.log("There is no cell");
         cellIndex = Math.floor(Math.random() * cellBlocks.length);
         cell = cellBlocks[cellIndex];
@@ -461,6 +500,11 @@ function throwEnemyBomb() {
     }
   } while (cell != null && cell.classList.contains("enemy-bombed"));
 
+  if (currentBoatCells.length > 0) {
+    currentBoatCells.splice(0, 1);
+  }
+
+  lastThrowedBomb = cell;
   let allThrowedBombs = document.querySelectorAll(".enemy-bombed");
 
   if (allThrowedBombs != null) {
@@ -475,6 +519,28 @@ function throwEnemyBomb() {
     cell.classList.add("enemy-bombed");
     cell.style.backgroundColor = "purple";
     lastThrowedBomb = cell;
+
+    // Zoek naar de 'boat-?' class
+    const boatClass = Array.from(cell.classList).find((cls) =>
+      /^boat-[0-4]$/.test(cls),
+    );
+
+    console.log(boatClass);
+
+    if (boatClass) {
+      cellBlocks.forEach((cell) => {
+        if (
+          cell.classList.contains(boatClass) &&
+          !cell.classList.contains("enemy-bombed")
+        ) {
+          currentBoatCells.push(cell);
+        }
+      });
+    } else {
+      console.log("Geen boot gevonden op deze cel.");
+    }
+
+    lastHitBoatIndex = boatClass;
   } else {
     cell.classList.add("enemy-bombed");
     cell.style.backgroundColor = "lightblue";
@@ -486,7 +552,7 @@ function throwEnemyBomb() {
   turnTextElement.innerText = _playerTurnString;
 
   if (nearbyCells.length > 0) {
-    nearbyCells.splice(_randomIndex, 1);
+    nearbyCells.splice(randomIndex, 1);
     console.log(nearbyCells);
   }
 }
