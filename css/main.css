@@ -40,14 +40,14 @@ body {
 }
 
 .cell {
-  background-color: #276786;
+  background-color: #3997cc;
   border: 1px solid #333;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 .enemy-cell {
-  background-color: #276786;
+  background-color: #3997cc;
   border: 1px solid #333;
   display: flex;
   justify-content: center;
@@ -77,7 +77,7 @@ body {
   width: 35%;
   height: 35%;
   border-radius: 50%;
-  background-color: white;
+  background-color: green;
 }
 
 button {
