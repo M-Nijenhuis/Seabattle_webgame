@@ -417,7 +417,7 @@ function enableBombThrowing() {
         if (isPlayerTurn === true && !cell.classList.contains("bombed")) {
           const cellIndex = parseInt(cell.dataset.index, 10);
           highlightBomb(cellIndex, enemyCellBlocks, false);
-          placeBomb(cellIndex, enemyCellBlocks, _seaColor);
+          placeBomb(cellIndex, enemyCellBlocks, "#2b76a1");
           isPlayerTurn = false;
           setTimeout(throwEnemyBomb, 1500);
           turnTextElement.innerText = _aiTurnString;
@@ -433,6 +433,7 @@ let currentBoatCells = [];
 let lastThrowedBomb;
 let foundBoatIndex = [];
 let lastBoatIndex;
+let boatClass;
 
 function throwEnemyBomb() {
   let cellIndex;
@@ -518,7 +519,6 @@ function throwEnemyBomb() {
   }
 
   let allThrowedBombs = document.querySelectorAll(".enemy-bombed");
-  console.log(allThrowedBombs);
 
   if (allThrowedBombs != null) {
     for (let i = 0; i < allThrowedBombs.length; i++) {
@@ -526,13 +526,11 @@ function throwEnemyBomb() {
         const greenHitColor =
           allThrowedBombs[i].querySelector(".last-hit-bomb");
         const normalHitColor = allThrowedBombs[i].querySelector(".miss-bomb");
-        console.log("Where in");
         if (greenHitColor) {
           greenHitColor.remove();
         } else {
           normalHitColor.remove();
         }
-        console.log("Where trying");
         allThrowedBombs[i].innerHTML += _missBombHTML;
       }
     }
@@ -546,7 +544,7 @@ function throwEnemyBomb() {
     cell.innerHTML += _hitBombHTML;
 
     // Zoek naar de 'boat-?' class
-    const boatClass = Array.from(cell.classList).find((cls) =>
+    boatClass = Array.from(cell.classList).find((cls) =>
       /^boat-[0-4]$/.test(cls),
     );
 
@@ -586,4 +584,7 @@ function throwEnemyBomb() {
     nearbyCells.splice(randomIndex, 1);
     console.log(nearbyCells);
   }
+
+
+  console.log(boatClass);
 }
