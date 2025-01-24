@@ -19,6 +19,7 @@ const _lastHitBombHTML = '<div class="last-hit-bomb"></div>';
 const _seaColor = "#3997cc";
 const _boatHoverColor = "#828282";
 const _boatColor = "#c4c4c4";
+const _boatSinkColor = "#807f7f";
 
 //Add a mouseover event to all buttons
 _boat1ReplaceButton.addEventListener("mouseover", () => {
@@ -68,6 +69,16 @@ CreateBoard(playerBoard, "cell");
 //This are all the cell in the player field
 const cellBlocks = document.querySelectorAll(".cell");
 const enemyCellBlocks = document.querySelectorAll(".enemy-cell");
+
+//This are all arrays with the cells in it from the boat-id
+let boat0Cells = [];
+let boat1Cells = [];
+let boat2Cells = [];
+let boat3Cells = [];
+let boat4Cells = [];
+
+//This is the array with all the variables so I can easily forloop all arrays
+const boatCells = [boat0Cells, boat1Cells, boat2Cells, boat3Cells, boat4Cells];
 
 const _playerTurnString = "Your Turn!";
 const _aiTurnString = "It's the enemy's turn";
@@ -249,6 +260,7 @@ function placeBomb(cellIndex, cellBlocks, color) {
       cell.style.backgroundColor = _boatColor;
       cell.classList.add("bombed");
       cell.innerHTML += _hitBombHTML;
+      checkIfBoatIsFullyHit();
     } else {
       cell.classList.add("bombed");
       cell.style.backgroundColor = color;
@@ -299,6 +311,7 @@ function placeBoat(startIndex, size, boatNumber) {
     if (cell) {
       cell.classList.add("placed");
       cell.classList.add(`boat-${boatNumber}`);
+
       cell.style.backgroundColor = _boatColor;
     }
   }
@@ -362,7 +375,14 @@ function placeEnemyBoats() {
     do {
       randomStartIndex = Math.floor(Math.random() * enemyCellBlocks.length);
       randomDirectionBool = Math.random() < 0.5;
-    } while (!canPlaceBoat( randomStartIndex, boatSize, randomDirectionBool, enemyCellBlocks,));
+    } while (
+      !canPlaceBoat(
+        randomStartIndex,
+        boatSize,
+        randomDirectionBool,
+        enemyCellBlocks,
+      )
+    );
 
     for (let i = 0; i < boatSize; i++) {
       let cellIndex;
@@ -379,6 +399,12 @@ function placeEnemyBoats() {
         cell.classList.add("placed");
         cell.classList.add(`boat-${boatNumber}`);
         //cell.style.backgroundColor = colors[0];
+
+        for (let i = 0; i < 5; i++) {
+          if (i === boatNumber) {
+            boatCells[i].push(cell);
+          }
+        }
       }
     }
 
@@ -387,6 +413,21 @@ function placeEnemyBoats() {
   }
 
   turnTextElement.innerText = _playerTurnString;
+}
+
+function checkIfBoatIsFullyHit() {
+
+  for (let i = 0; i < 5; i++) {
+    const isFullyHit = boatCells[i].every((cell) => cell.classList.contains("bombed"));
+
+    if (isFullyHit) {
+      // Markeer alle cellen van deze boot als geel
+      boatCells[i].forEach((cell) => {
+        cell.style.backgroundColor = _boatSinkColor;
+      });
+      console.log(`Boat-${i} is fully hit and highlighted!`);
+    }
+  }
 }
 
 function enableBombThrowing() {
@@ -454,7 +495,10 @@ function throwEnemyBomb() {
         cellIndex = nearbyCells[randomIndex];
         cell = cellBlocks[cellIndex];
         console.log("The near cell is" + cell);
-      } else if (lastThrowedBomb && lastThrowedBomb.classList.contains("placed")) {
+      } else if (
+        lastThrowedBomb &&
+        lastThrowedBomb.classList.contains("placed")
+      ) {
         console.log("Er is een bom geraakt en we gaan zoeken voor een buurman");
 
         const lastBombCellIndex = parseInt(lastThrowedBomb.dataset.index, 10);
@@ -584,7 +628,6 @@ function throwEnemyBomb() {
     nearbyCells.splice(randomIndex, 1);
     console.log(nearbyCells);
   }
-
 
   console.log(boatClass);
 }
