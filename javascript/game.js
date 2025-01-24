@@ -77,8 +77,22 @@ let boat2Cells = [];
 let boat3Cells = [];
 let boat4Cells = [];
 
+//This are all arrays with the cells from the enemy boats in it from the boat-id
+let enemyBoat0Cells = [];
+let enemyBoat1Cells = [];
+let enemyBoat2Cells = [];
+let enemyBoat3Cells = [];
+let enemyBoat4Cells = [];
+
 //This is the array with all the variables so I can easily forloop all arrays
 const boatCells = [boat0Cells, boat1Cells, boat2Cells, boat3Cells, boat4Cells];
+const enemyBoatCells = [
+  enemyBoat0Cells,
+  enemyBoat1Cells,
+  enemyBoat2Cells,
+  enemyBoat3Cells,
+  enemyBoat4Cells,
+];
 
 const _playerTurnString = "Your Turn!";
 const _aiTurnString = "It's the enemy's turn";
@@ -313,6 +327,12 @@ function placeBoat(startIndex, size, boatNumber) {
       cell.classList.add(`boat-${boatNumber}`);
 
       cell.style.backgroundColor = _boatColor;
+
+      for (let i = 0; i < 5; i++) {
+        if (i === boatNumber) {
+          boatCells[i].push(cell);
+        }
+      }
     }
   }
   boatIsChoosed = false;
@@ -356,6 +376,8 @@ function startGame() {
 let colors = ["red", "blue", "orange", "pink", "green"];
 
 function placeEnemyBoats() {
+  boatNumber = 0;
+
   // All cell blocks in one constant
   const enemyCellBlocks = document.querySelectorAll(".enemy-cell");
 
@@ -402,7 +424,7 @@ function placeEnemyBoats() {
 
         for (let i = 0; i < 5; i++) {
           if (i === boatNumber) {
-            boatCells[i].push(cell);
+            enemyBoatCells[i].push(cell);
           }
         }
       }
@@ -416,16 +438,31 @@ function placeEnemyBoats() {
 }
 
 function checkIfBoatIsFullyHit() {
+  for (let i = 0; i < 5; i++) {
+    const enemyIsFullyHit = enemyBoatCells[i].every((cell) =>
+      cell.classList.contains("bombed"),
+    );
+
+    if (enemyIsFullyHit) {
+      // Markeer alle cellen van deze boot als geel
+      enemyBoatCells[i].forEach((cell) => {
+        cell.style.backgroundColor = _boatSinkColor;
+      });
+      console.log(`Boat-${i} is fully hit and highlighted!`);
+    }
+  }
 
   for (let i = 0; i < 5; i++) {
-    const isFullyHit = boatCells[i].every((cell) => cell.classList.contains("bombed"));
+    const isFullyHit = boatCells[i].every((cell) =>
+      cell.classList.contains("enemy-bombed"),
+    );
 
     if (isFullyHit) {
       // Markeer alle cellen van deze boot als geel
       boatCells[i].forEach((cell) => {
         cell.style.backgroundColor = _boatSinkColor;
       });
-      console.log(`Boat-${i} is fully hit and highlighted!`);
+      console.log(`Enemy boat-${i} is fully hit and highlighted!`);
     }
   }
 }
@@ -630,4 +667,6 @@ function throwEnemyBomb() {
   }
 
   console.log(boatClass);
+
+  checkIfBoatIsFullyHit();
 }
