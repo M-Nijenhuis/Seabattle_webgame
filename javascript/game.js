@@ -469,6 +469,8 @@ function checkIfBoatIsFullyHit() {
 
 function enableBombThrowing() {
   const enemyCellBlocks = document.querySelectorAll(".enemy-cell");
+  const _showBomb = true;
+  const _deleteBomb = false;
 
   if (isPlayerTurn) {
     enemyCellBlocks.forEach((cell) => {
@@ -476,7 +478,7 @@ function enableBombThrowing() {
         if (isPlayerTurn === true) {
           const cellIndex = parseInt(cell.dataset.index, 10);
           if (!cell.classList.contains("bombed")) {
-            highlightBomb(cellIndex, enemyCellBlocks, true);
+            highlightBomb(cellIndex, enemyCellBlocks, _showBomb);
           }
         }
       });
@@ -486,7 +488,7 @@ function enableBombThrowing() {
           const cellIndex = parseInt(cell.dataset.index, 10);
 
           if (!cell.classList.contains("bombed")) {
-            highlightBomb(cellIndex, enemyCellBlocks, false);
+            highlightBomb(cellIndex, enemyCellBlocks, _deleteBomb);
           }
         }
       });
@@ -494,7 +496,7 @@ function enableBombThrowing() {
       cell.addEventListener("click", () => {
         if (isPlayerTurn === true && !cell.classList.contains("bombed")) {
           const cellIndex = parseInt(cell.dataset.index, 10);
-          highlightBomb(cellIndex, enemyCellBlocks, false);
+          highlightBomb(cellIndex, enemyCellBlocks, _deleteBomb);
           placeBomb(cellIndex, enemyCellBlocks, "#2b76a1");
           isPlayerTurn = false;
           setTimeout(throwEnemyBomb, 1500);
