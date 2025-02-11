@@ -21,38 +21,10 @@ const _boatHoverColor = "#828282";
 const _boatColor = "#c4c4c4";
 const _boatSinkColor = "#807f7f";
 
-//Add a mouseover event to all buttons
-_boat1ReplaceButton.addEventListener("mouseover", () => {
-  makeBoatDarker(0, _boatHoverColor);
-});
-_boat2ReplaceButton.addEventListener("mouseover", () => {
-  makeBoatDarker(1, _boatHoverColor);
-});
-_boat3ReplaceButton.addEventListener("mouseover", () => {
-  makeBoatDarker(2, _boatHoverColor);
-});
-_boat4ReplaceButton.addEventListener("mouseover", () => {
-  makeBoatDarker(3, _boatHoverColor);
-});
-_boat5ReplaceButton.addEventListener("mouseover", () => {
-  makeBoatDarker(4, _boatHoverColor);
-});
+//All the boat id in an array
+let allboatsId = [0, 1, 2, 3, 4];
+let allEnemyBoatsId = [0, 1, 2, 3, 4];
 
-_boat1ReplaceButton.addEventListener("mouseleave", () => {
-  makeBoatDarker(0, _boatColor);
-});
-_boat2ReplaceButton.addEventListener("mouseleave", () => {
-  makeBoatDarker(1, _boatColor);
-});
-_boat3ReplaceButton.addEventListener("mouseleave", () => {
-  makeBoatDarker(2, _boatColor);
-});
-_boat4ReplaceButton.addEventListener("mouseleave", () => {
-  makeBoatDarker(3, _boatColor);
-});
-_boat5ReplaceButton.addEventListener("mouseleave", () => {
-  makeBoatDarker(4, _boatColor);
-});
 
 //This is the function that create all the block in the playerfield
 function CreateBoard(board, cellName) {
@@ -85,14 +57,10 @@ let enemyBoat3Cells = [];
 let enemyBoat4Cells = [];
 
 //This is the array with all the variables so I can easily forloop all arrays
-const boatCells = [boat0Cells, boat1Cells, boat2Cells, boat3Cells, boat4Cells];
-const enemyBoatCells = [
-  enemyBoat0Cells,
-  enemyBoat1Cells,
-  enemyBoat2Cells,
-  enemyBoat3Cells,
-  enemyBoat4Cells,
-];
+const _boatCells = [boat0Cells, boat1Cells, boat2Cells, boat3Cells, boat4Cells];
+const _enemyBoatCells = [enemyBoat0Cells, enemyBoat1Cells, enemyBoat2Cells, enemyBoat3Cells, enemyBoat4Cells];
+
+const _boatReplaceButtonsArray = [_boat1ReplaceButton, _boat2ReplaceButton, _boat3ReplaceButton, _boat4ReplaceButton, _boat5ReplaceButton];
 
 const _playerTurnString = "Your Turn!";
 const _aiTurnString = "It's the enemy's turn";
@@ -107,8 +75,22 @@ let currentHoveredCell = null;
 let boatNumber = 0;
 let gameIsStarted = false;
 let isPlayerTurn = true;
+let boatsHit = 0;
+let enemyBoatsHit = 0;
 
 let placedBoats = 0;
+
+
+// This is the code that highlights the boat when hover over the replace button
+_boatReplaceButtonsArray.forEach((button, index) => {
+  button.addEventListener("mouseover", () => {
+    makeBoatDarker(index, _boatHoverColor);
+  });
+
+  button.addEventListener("mouseleave", () => {
+    makeBoatDarker(index, _boatColor);
+  });
+});
 
 //This code rotates the boat with a specific button press
 document.addEventListener("keydown", (event) => {
@@ -311,6 +293,8 @@ function canPlaceBoat(startIndex, size, isHorizontal, cellBlocks) {
 function placeBoat(startIndex, size, boatNumber) {
   placedBoats++;
 
+  console.log(placedBoats);
+
   for (let i = 0; i < size; i++) {
     let cellIndex;
 
@@ -330,7 +314,7 @@ function placeBoat(startIndex, size, boatNumber) {
 
       for (let i = 0; i < 5; i++) {
         if (i === boatNumber) {
-          boatCells[i].push(cell);
+          _boatCells[i].push(cell);
         }
       }
     }
@@ -344,6 +328,8 @@ function placeBoat(startIndex, size, boatNumber) {
 
 function replaceBoat(boatNumber) {
   placedBoats--;
+  console.log(placedBoats);
+
   cellBlocks.forEach((cell) => {
     if (cell.classList.contains(`boat-${boatNumber}`)) {
       cell.classList.remove(`boat-${boatNumber}`);
@@ -424,7 +410,7 @@ function placeEnemyBoats() {
 
         for (let i = 0; i < 5; i++) {
           if (i === boatNumber) {
-            enemyBoatCells[i].push(cell);
+            _enemyBoatCells[i].push(cell);
           }
         }
       }
@@ -438,14 +424,15 @@ function placeEnemyBoats() {
 }
 
 function checkIfBoatIsFullyHit() {
+
   for (let i = 0; i < 5; i++) {
-    const enemyIsFullyHit = enemyBoatCells[i].every((cell) =>
+    const enemyIsFullyHit = _enemyBoatCells[i].every((cell) =>
       cell.classList.contains("bombed"),
     );
 
     if (enemyIsFullyHit) {
       // Markeer alle cellen van deze boot als geel
-      enemyBoatCells[i].forEach((cell) => {
+      _enemyBoatCells[i].forEach((cell) => {
         cell.style.backgroundColor = _boatSinkColor;
       });
       console.log(`Boat-${i} is fully hit and highlighted!`);
@@ -453,13 +440,13 @@ function checkIfBoatIsFullyHit() {
   }
 
   for (let i = 0; i < 5; i++) {
-    const isFullyHit = boatCells[i].every((cell) =>
+    const isFullyHit = _boatCells[i].every((cell) =>
       cell.classList.contains("enemy-bombed"),
     );
 
     if (isFullyHit) {
       // Markeer alle cellen van deze boot als geel
-      boatCells[i].forEach((cell) => {
+      _boatCells[i].forEach((cell) => {
         cell.style.backgroundColor = _boatSinkColor;
       });
       console.log(`Enemy boat-${i} is fully hit and highlighted!`);
@@ -467,10 +454,24 @@ function checkIfBoatIsFullyHit() {
   }
 }
 
+function checkIfWon() {
+
+  console.log(boatsHit);
+  console.log(enemyBoatsHit)
+  
+  if (boatsHit >= 5) {
+    turnTextElement.innerText = "Hello, The ai won";
+  } else {
+    turnTextElement.innerText = "Hello, You won";
+  }
+}
+
 function enableBombThrowing() {
   const enemyCellBlocks = document.querySelectorAll(".enemy-cell");
   const _showBomb = true;
   const _deleteBomb = false;
+
+  checkIfWon();
 
   if (isPlayerTurn) {
     enemyCellBlocks.forEach((cell) => {
